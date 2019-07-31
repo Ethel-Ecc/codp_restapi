@@ -3,10 +3,12 @@ import os as os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_restful import Resource, Api
 
 
 # Initialize the app
 app = Flask(__name__)
+api = Api(app)
 
 # set the base directory for the app and DB
 base_directory = os.path.abspath(os.path.dirname(__file__))
@@ -127,9 +129,32 @@ def delete_product(id):
     return product_schema.jsonify(product)
 
 
+class HelloWorld(Resource):
+    def get(self):
+        return {'Ethel': 'world'}
+
+
+# api.add_resource(HelloWorld, '/hello')
+
+
+todos = {}
+
+
+class TodoSimple(Resource):
+    def get(self, todo_id):
+        return {todo_id: todos[todo_id]}
+
+    def put(self, todo_id):
+        todos[todo_id] = request.form['data']
+        return {todo_id: todos[todo_id]}
+
+
+api.add_resource(TodoSimple, '/<string:todo_id>')
+
+
 # run the server
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port='3000')
+    app.run(debug=True, host='127.0.0.1', port='3000')
 
 
 
